@@ -1,0 +1,76 @@
+
+<!--
+    MediaPipe Hands
+    https://google.github.io/mediapipe/solutions/hands.html#javascript-solution-api
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils_3d@0.3/control_utils_3d.css" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.6/control_utils.css" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="hands_visjs.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.6/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils_3d@0.3/control_utils_3d.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.21.0/vis.min.js" integrity="sha512-XHDcSyqhOoO2ocB7sKOCJEkUjw/pQCJViP1ynpy+EGh/LggzrP6U/V3a++LQTnZT7sCQKeHRyWHfhN2afjXjCg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  
+</head>
+
+<body>
+    <style>
+      .square-box {
+        width: 1260px;
+        height: 945px;
+        position: absolute;
+        left: 0px;
+        top: 0px;
+      }
+  
+      .vis-network {
+        width: 1260px;
+        height: 945px;
+        position: absolute;
+        top:0;
+        left:0;
+        background-color: #99999999;
+      }
+
+      .output_canvas {
+        width: 1260px;
+        height: 945px;
+        display: block;
+        position: absolute;
+        left: 0;
+        top: 0;
+      }
+      
+    </style>
+    <div class="container">
+      <video class="input_video" ></video>
+      <canvas class="output_canvas" width="1280px" height="720px"></canvas>
+      <div class="loading">
+        <div class="spinner"></div>
+        <div class="message">
+          Loading
+        </div>
+      </div>
+      
+    </div>
+    <div class="control-panel" style="visibility:hidden">
+    </div>
+    <div class='square-box'>
+      <div class="vis-network" id="mynetwork" width="1280px" height="720px">
+      </div>
+    </div>
+    
+</body>
+
+</html>
+
+
+<script type="module" src="hands_visjs.js"></script>

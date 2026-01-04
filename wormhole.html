@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils_3d@0.3/control_utils_3d.css" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.6/control_utils.css" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="wormhole.css" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.6/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils_3d@0.3/control_utils_3d.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4/face_mesh.js" crossorigin="anonymous"></script>
+  
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Space Face</title>
+    <style>
+      body {
+        margin: 0;
+        cursor: crosshair;
+      }
+    </style>
+    <script type="importmap">
+      {
+				"imports": {
+					"three": "https://cdn.jsdelivr.net/npm/three@0.161/build/three.module.js",
+          "jsm/": "https://cdn.jsdelivr.net/npm/three@0.161/examples/jsm/"
+        }
+			}
+    </script>
+     
+  </head>
+  <body>
+    <!-- Point counter display should be visible above container-->
+    <div class="container">
+      <video class="input_video" ></video>
+      <div id="point-counter" style="background-color: black; color: red; display:block; font-size: large; text-align: center; width: 20%; position:absolute; top: 0px; left: 50%; transform: translate(-50%, 0)"><h1>0</h1></div>
+      <canvas class="output_canvas" width="1280px" height="720px" style="display: block; margin: 0 auto;"></canvas>
+      <div class="loading">
+      <div class="spinner"></div>
+      <div class="message">
+        Loading
+      </div>
+      </div>
+    </div>
+    <div class='wormhole-container'>
+      <div class="wormhole-container" id="wormhole-container" >
+      </div>
+    </div>
+    <div class="control-panel" >
+    </div>
+    <script type="module" src="wormhole.js"></script>
+  </body>
+</html>
