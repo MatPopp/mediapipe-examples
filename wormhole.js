@@ -746,3 +746,6 @@ window.addEventListener('keydown', (event) => {
     }
   }
 });
+
+// start with controls hidden
+controlsElement.style.display = 'none';
