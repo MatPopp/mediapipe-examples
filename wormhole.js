@@ -32,6 +32,7 @@ spinner.ontransitionend = () => {
 // wormhole animation
 let w = window.innerWidth;
 let h = window.innerHeight;
+let last_camera_update = Date.now();
 const scene = new THREE.Scene();
 scene.fog = new THREE.FogExp2(0x000000, 0.3);
 const camera = new THREE.PerspectiveCamera(75, w / h, 0.1, 1000);
@@ -62,7 +63,8 @@ let mouth_open_distance = 0.02;
 let enableFaceGeometry = false;
 
 let camera_pos = spline.getPointAt(0);
-let camera_speed = 0.01;
+let camera_speed = 0.0005;
+let camera_speed_0 = 0.0005;
 
 let camera_matrix = new THREE.Matrix4();
 
@@ -345,14 +347,16 @@ window.addEventListener('pointermove', onPointerMove, false);
 function updateCamera(t_ms) {
   const time = t_ms * 0.1;
   const looptime = 10 * 1000;
+  const dt = Date.now() - last_camera_update;
+  last_camera_update = Date.now();
 
-  camera_speed = 0.01 + 0.01 * t_ms/1000/60; // slowly accelerate
+  camera_speed = camera_speed_0 + camera_speed_0 * t_ms/1000/60; // slowly accelerate
   // multiplier based on smile value
   smile_speed_multiplier = 1.0 - 3 * smile_value;
   camera_speed *= smile_speed_multiplier;
   // add points to counter over time if inside tube 
   if (!cameraOutsideTube()) {
-    points_counter += camera_speed ;
+    points_counter += camera_speed*dt ;
     pointCounterElement.innerHTML = `<h1 style="color:green">${points_counter.toFixed(0)}</h1>`;
   }
   else{
@@ -369,14 +373,18 @@ function updateCamera(t_ms) {
   let v_y = -camera_matrix.elements[9];
   let v_z = -camera_matrix.elements[10];
   let lookAtVector = new THREE.Vector3(v_x, v_y, v_z);
+
   
-  camera_pos.addScaledVector(lookAtVector, camera_speed);
+  console.log("dt:", dt);
+  camera_pos.addScaledVector(lookAtVector, camera_speed*dt);
   camera.position.copy(camera_pos);
   //camera.lookAt(lookAt);
   
   let d_matrix = new THREE.Matrix4();
   // set rotation from face tracking data
-  d_matrix.makeRotationFromEuler(new THREE.Euler(face_rot_x * x_rot_sensitivity, face_rot_y * y_rot_sensitivity, face_rot_z * z_rot_sensitivity));
+  const fudge_factor = 25;
+  const dd = dt / fudge_factor;
+  d_matrix.makeRotationFromEuler(new THREE.Euler(face_rot_x * x_rot_sensitivity * dd , face_rot_y * y_rot_sensitivity * dd, face_rot_z * z_rot_sensitivity * dd));
   
   // apply rotation to camera matrix
   camera_matrix.multiplyMatrices(camera_matrix, d_matrix);
