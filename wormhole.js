@@ -50,6 +50,9 @@ let face_rot_z = 0;
 let face_rot_x = 0;
 let face_rot_y = 0;
 
+let smile_value = 0;
+let smile_speed_multiplier = 1.0;
+
 let x_rot_sensitivity = 0.3;
 let y_rot_sensitivity = 0.25;
 let z_rot_sensitivity = 0.15;
@@ -123,7 +126,11 @@ const tubeGeo = new THREE.TubeGeometry(spline, 222, tubeRadius, 16, true);
 // create edges geometry from the spline
 const tubeColor = new THREE.Color(0x5900ffff);
 const edges = new THREE.EdgesGeometry(tubeGeo, 0.2);
-const lineMat = new THREE.LineBasicMaterial({ color: 0xb34fffff });
+const lineMat = new THREE.LineBasicMaterial({ color: new THREE.Color().setRGB(
+          0.5,  
+          0.5,
+          0.0,
+        )});
 const tubeLines = new THREE.LineSegments(edges, lineMat);
 scene.add(tubeLines);
 
@@ -143,7 +150,7 @@ const boxGroup = new THREE.Group();
 scene.add(boxGroup);
 
 const numBoxes = 55;
-const box_size = 0.15;
+const box_size = 0.25;
 const boxGeo = new THREE.BoxGeometry(box_size, box_size, box_size);
 
 function addBox() {
@@ -167,7 +174,7 @@ function addBox() {
     Math.random() * Math.PI
   );
   hitBox.rotation.set(rote.x, rote.y, rote.z);
-  const edges = new THREE.EdgesGeometry(boxGeo, 0.2);
+  const edges = new THREE.EdgesGeometry(boxGeo, box_size);
 
   const lineMat = new THREE.LineBasicMaterial({ color });
   const boxLines = new THREE.LineSegments(edges, lineMat);
@@ -340,7 +347,9 @@ function updateCamera(t_ms) {
   const looptime = 10 * 1000;
 
   camera_speed = 0.01 + 0.01 * t_ms/1000/60; // slowly accelerate
-
+  // multiplier based on smile value
+  smile_speed_multiplier = 1.0 - 3 * smile_value;
+  camera_speed *= smile_speed_multiplier;
   // add points to counter over time if inside tube 
   if (!cameraOutsideTube()) {
     points_counter += camera_speed ;
@@ -381,7 +390,7 @@ function animate(t_ms = 0) {
   updateCamera(t_ms);
   crosshairs.position.set(mousePos.x, mousePos.y, -1);
   lasers.forEach(l => l.userData.update());
-  if ((mouse_clicked || mouth_open) && last_fired + laser_delay < Date.now()) {
+  if ((mouse_clicked || mouth_open) && last_fired + (laser_delay/smile_speed_multiplier) < Date.now()) {
     fireLaser();
     last_fired = Date.now();
   }
@@ -593,6 +602,32 @@ function onResults(results) {
         } else {
           mouth_open = false;
         }
+
+        // calculate smile value based on mouth corners (landmarks 61 and 291) and mouth center (landmark 13)
+        const mouthLeft = results.multiFaceLandmarks[0][61];
+        const mouthRight = results.multiFaceLandmarks[0][291];
+        // mouth center is between top and bottom lip centers
+        const mouthCenter = {
+          x: (mouthTop.x + mouthBottom.x) / 2,
+          y: (mouthTop.y + mouthBottom.y) / 2,
+          z: (mouthTop.z + mouthBottom.z) / 2
+        };
+
+        // smile value is the averagie sine from angle between horizontal line and line from mouth center to mouth corners
+        const angleLeft = Math.atan2(mouthCenter.y- mouthLeft.y,  mouthCenter.x - mouthLeft.x);
+        const angleRight = Math.atan2(mouthCenter.y - mouthRight.y, mouthRight.x - mouthCenter.x);
+        const smileLeft = Math.sin(angleLeft);
+        const smileRight = Math.sin(angleRight);
+        smile_value = (smileLeft + smileRight) / 2;
+        console.log("smile value:", smile_value.toFixed(3));
+        
+        // re-set color of wormhole lines based on smile value
+        const newColor = new THREE.Color().setRGB(
+          0.5 - 3*smile_value, 
+          0.5 + 3*smile_value,
+          0.0,
+        );
+        tubeLines.material.color = newColor;
     }
     canvasCtx.restore();
 }
